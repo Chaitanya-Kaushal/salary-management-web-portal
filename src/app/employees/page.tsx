@@ -3,9 +3,32 @@
 import { useEffect, useRef, useState } from 'react';
 import { useEmployees } from '@/hooks/use-employees';
 import { useUrlFilters } from '@/hooks/use-url-filters';
+import { useCreateEmployee } from '@/hooks/use-create-employee';
+import { useUpdateEmployee } from '@/hooks/use-update-employee';
+import { useDeleteEmployee } from '@/hooks/use-delete-employee';
 import { EmployeeTable } from '@/components/employees/employee-table';
 import { EmployeeFilters } from '@/components/employees/employee-filters';
 import { Pagination } from '@/components/employees/pagination';
+import { EmployeeForm, type EmployeeFormValues } from '@/components/employees/employee-form';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import type { Employee } from '@/lib/api-contract';
 
 const SEARCH_DEBOUNCE_MS = 300;
 
@@ -15,6 +38,13 @@ export default function EmployeesPage() {
 
   const [searchInput, setSearchInput] = useState(filters.search ?? '');
   const firstRender = useRef(true);
+  const [addOpen, setAddOpen] = useState(false);
+  const [editEmployee, setEditEmployee] = useState<Employee | null>(null);
+  const [deleteEmployee, setDeleteEmployee] = useState<Employee | null>(null);
+
+  const createMutation = useCreateEmployee();
+  const updateMutation = useUpdateEmployee();
+  const deleteMutation = useDeleteEmployee();
 
   useEffect(() => {
     if (firstRender.current) {
@@ -61,12 +91,33 @@ export default function EmployeesPage() {
             onChange={(e) => setSearchInput(e.target.value)}
             className="w-64 rounded border px-3 py-2 text-sm"
           />
+          <Dialog open={addOpen} onOpenChange={setAddOpen}>
+            <DialogTrigger render={<Button>Add employee</Button>} />
+            <DialogContent className="sm:max-w-lg">
+              <DialogHeader>
+                <DialogTitle>Add employee</DialogTitle>
+              </DialogHeader>
+              <EmployeeForm
+                submitLabel="Create"
+                isPending={createMutation.isPending}
+                onSubmit={(values) =>
+                  createMutation.mutate(values, {
+                    onSuccess: () => setAddOpen(false),
+                  })
+                }
+              />
+            </DialogContent>
+          </Dialog>
         </div>
       </header>
 
       {hasResults ? (
         <>
-          <EmployeeTable employees={data.data} />
+          <EmployeeTable
+            employees={data.data}
+            onEdit={(emp) => setEditEmployee(emp)}
+            onDelete={(emp) => setDeleteEmployee(emp)}
+          />
           <Pagination
             page={data.page}
             pageSize={data.pageSize}
@@ -77,6 +128,67 @@ export default function EmployeesPage() {
       ) : (
         <p className="py-12 text-center text-muted-foreground">No employees match.</p>
       )}
+
+      <Dialog open={Boolean(editEmployee)} onOpenChange={(open) => !open && setEditEmployee(null)}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Edit employee</DialogTitle>
+          </DialogHeader>
+          {editEmployee && (
+            <EmployeeForm
+              defaultValues={toFormValues(editEmployee)}
+              submitLabel="Save"
+              isPending={updateMutation.isPending}
+              onSubmit={(values) =>
+                updateMutation.mutate(
+                  { id: editEmployee.id, values },
+                  { onSuccess: () => setEditEmployee(null) },
+                )
+              }
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog
+        open={Boolean(deleteEmployee)}
+        onOpenChange={(open) => !open && setDeleteEmployee(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete employee?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {deleteEmployee?.fullName} will be permanently removed.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (!deleteEmployee) return;
+                deleteMutation.mutate(deleteEmployee.id);
+                setDeleteEmployee(null);
+              }}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </main>
   );
+}
+
+function toFormValues(e: Employee): EmployeeFormValues {
+  return {
+    fullName: e.fullName,
+    email: e.email,
+    jobTitle: e.jobTitle,
+    department: e.department,
+    country: e.country,
+    currency: e.currency,
+    salary: e.salary,
+    employmentType: e.employmentType,
+    hireDate: e.hireDate.slice(0, 10),
+  };
 }

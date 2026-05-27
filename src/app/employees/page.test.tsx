@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { http, HttpResponse } from 'msw';
@@ -110,6 +110,109 @@ describe('employees page', () => {
       },
       { timeout: 1000 },
     );
+  });
+
+  it('clicking add opens a dialog with form fields and validates required name', async () => {
+    server.use(
+      http.get('http://localhost:4000/employees', () =>
+        HttpResponse.json({ data: [], total: 0, page: 1, pageSize: 10 }),
+      ),
+    );
+
+    const user = userEvent.setup();
+    renderWithProviders(<EmployeesPage />);
+
+    await screen.findByText(/no employees/i);
+    await user.click(screen.getByRole('button', { name: /add employee/i }));
+
+    expect(await screen.findByRole('dialog')).toBeInTheDocument();
+    expect(screen.getByLabelText(/full name/i)).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /^create$/i }));
+
+    expect(await screen.findByText(/full name is required/i)).toBeInTheDocument();
+  });
+
+  it('submitting add posts the new employee and closes the dialog', async () => {
+    let captured: Record<string, unknown> | null = null;
+    server.use(
+      http.get('http://localhost:4000/employees', () =>
+        HttpResponse.json({ data: [], total: 0, page: 1, pageSize: 10 }),
+      ),
+      http.post('http://localhost:4000/employees', async ({ request }) => {
+        captured = (await request.json()) as Record<string, unknown>;
+        return HttpResponse.json({ id: 'new-id', ...captured }, { status: 201 });
+      }),
+    );
+
+    const user = userEvent.setup();
+    renderWithProviders(<EmployeesPage />);
+    await screen.findByText(/no employees/i);
+
+    await user.click(screen.getByRole('button', { name: /add employee/i }));
+
+    const dialog = await screen.findByRole('dialog');
+    await user.type(within(dialog).getByLabelText(/full name/i), 'Dave Davis');
+    await user.type(within(dialog).getByLabelText(/^email$/i), 'dave@example.com');
+    await user.type(within(dialog).getByLabelText(/job title/i), 'Engineer');
+    await user.type(within(dialog).getByLabelText(/department/i), 'Engineering');
+    await user.type(within(dialog).getByLabelText(/country code/i), 'US');
+    await user.type(within(dialog).getByLabelText(/currency code/i), 'USD');
+    await user.type(within(dialog).getByLabelText(/salary/i), '5000000');
+    await user.type(within(dialog).getByLabelText(/hire date/i), '2024-01-01');
+    await user.click(within(dialog).getByRole('button', { name: /^create$/i }));
+
+    await waitFor(() => {
+      expect(captured).toMatchObject({ fullName: 'Dave Davis', email: 'dave@example.com' });
+    });
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+  });
+
+  it('clicking edit opens a dialog pre-filled with the row data', async () => {
+    const employee = buildEmployee({ id: 'e1', fullName: 'Alice Anderson' });
+    server.use(
+      http.get('http://localhost:4000/employees', () =>
+        HttpResponse.json({ data: [employee], total: 1, page: 1, pageSize: 10 }),
+      ),
+    );
+
+    const user = userEvent.setup();
+    renderWithProviders(<EmployeesPage />);
+    await screen.findByText('Alice Anderson');
+
+    await user.click(screen.getByRole('button', { name: /edit alice anderson/i }));
+
+    const dialog = await screen.findByRole('dialog');
+    expect(within(dialog).getByLabelText(/full name/i)).toHaveValue('Alice Anderson');
+  });
+
+  it('clicking delete confirms then calls DELETE for the employee', async () => {
+    let deletedId: string | null = null;
+    const employee = buildEmployee({ id: 'e1', fullName: 'Alice Anderson' });
+    server.use(
+      http.get('http://localhost:4000/employees', () =>
+        HttpResponse.json({ data: [employee], total: 1, page: 1, pageSize: 10 }),
+      ),
+      http.delete('http://localhost:4000/employees/:id', ({ params }) => {
+        deletedId = params.id as string;
+        return new HttpResponse(null, { status: 204 });
+      }),
+    );
+
+    const user = userEvent.setup();
+    renderWithProviders(<EmployeesPage />);
+    await screen.findByText('Alice Anderson');
+
+    await user.click(screen.getByRole('button', { name: /delete alice anderson/i }));
+
+    const confirmDialog = await screen.findByRole('alertdialog');
+    await user.click(within(confirmDialog).getByRole('button', { name: /^delete$/i }));
+
+    await waitFor(() => {
+      expect(deletedId).toBe('e1');
+    });
   });
 
   it('selecting a country filter pushes country param to the URL', async () => {
