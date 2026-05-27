@@ -1,6 +1,7 @@
 'use client';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ThemeProvider } from 'next-themes';
 import { useState } from 'react';
 import { MswProvider } from '@/components/msw-provider';
 
@@ -19,8 +20,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <MswProvider>
-      <QueryClientProvider client={client}>{children}</QueryClientProvider>
-    </MswProvider>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+      <MswProvider>
+        <QueryClientProvider client={client}>{children}</QueryClientProvider>
+      </MswProvider>
+    </ThemeProvider>
   );
 }
