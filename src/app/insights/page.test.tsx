@@ -22,6 +22,22 @@ function summaryHandler() {
   );
 }
 
+function byCountryHandler() {
+  return http.get('http://localhost:4000/insights/by-country', () =>
+    HttpResponse.json([
+      {
+        country: 'US',
+        count: 50,
+        min: 80_000_00,
+        max: 250_000_00,
+        avg: 150_000_00,
+        median: 140_000_00,
+        bands: [],
+      },
+    ]),
+  );
+}
+
 describe('insights page', () => {
   it('renders total employees and total payroll tiles', async () => {
     server.use(summaryHandler());
@@ -32,22 +48,7 @@ describe('insights page', () => {
   });
 
   it('renders by-country cards with min, max, avg, median', async () => {
-    server.use(
-      summaryHandler(),
-      http.get('http://localhost:4000/insights/by-country', () =>
-        HttpResponse.json([
-          {
-            country: 'US',
-            count: 50,
-            min: 80_000_00,
-            max: 250_000_00,
-            avg: 150_000_00,
-            median: 140_000_00,
-            bands: [],
-          },
-        ]),
-      ),
-    );
+    server.use(summaryHandler(), byCountryHandler());
 
     renderWithProviders(<InsightsPage />);
 
@@ -55,5 +56,23 @@ describe('insights page', () => {
     expect(await screen.findByText(/min/i)).toBeInTheDocument();
     expect(await screen.findByText(/max/i)).toBeInTheDocument();
     expect(await screen.findByText(/median/i)).toBeInTheDocument();
+  });
+
+  it('renders average salary by job title', async () => {
+    server.use(
+      summaryHandler(),
+      byCountryHandler(),
+      http.get('http://localhost:4000/insights/by-job-title', () =>
+        HttpResponse.json([
+          { jobTitle: 'Engineer', count: 30, avg: 150_000_00 },
+          { jobTitle: 'Manager', count: 10, avg: 200_000_00 },
+        ]),
+      ),
+    );
+
+    renderWithProviders(<InsightsPage />);
+
+    expect(await screen.findByText('Engineer')).toBeInTheDocument();
+    expect(await screen.findByText('Manager')).toBeInTheDocument();
   });
 });
