@@ -12,7 +12,8 @@ import type {
 
 const API_BASE =
   process.env.NODE_ENV === 'production'
-    ? (process.env.NEXT_PUBLIC_API_URL_PROD ?? 'http://localhost:4000')
+    ? (process.env.NEXT_PUBLIC_API_URL_PROD ??
+      'https://salary-management-api-server.onrender.com')
     : (process.env.NEXT_PUBLIC_API_URL_DEV ?? 'http://localhost:4000');
 
 type EmployeeInput = {
