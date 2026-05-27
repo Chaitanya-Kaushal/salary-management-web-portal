@@ -5,6 +5,7 @@ import { useEmployees } from '@/hooks/use-employees';
 import { useUrlFilters } from '@/hooks/use-url-filters';
 import { useCreateEmployee } from '@/hooks/use-create-employee';
 import { useUpdateEmployee } from '@/hooks/use-update-employee';
+import { useDeleteEmployee } from '@/hooks/use-delete-employee';
 import { EmployeeTable } from '@/components/employees/employee-table';
 import { EmployeeFilters } from '@/components/employees/employee-filters';
 import { Pagination } from '@/components/employees/pagination';
@@ -17,6 +18,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import type { Employee } from '@/lib/api-contract';
 
 const SEARCH_DEBOUNCE_MS = 300;
@@ -29,9 +40,11 @@ export default function EmployeesPage() {
   const firstRender = useRef(true);
   const [addOpen, setAddOpen] = useState(false);
   const [editEmployee, setEditEmployee] = useState<Employee | null>(null);
+  const [deleteEmployee, setDeleteEmployee] = useState<Employee | null>(null);
 
   const createMutation = useCreateEmployee();
   const updateMutation = useUpdateEmployee();
+  const deleteMutation = useDeleteEmployee();
 
   useEffect(() => {
     if (firstRender.current) {
@@ -100,7 +113,11 @@ export default function EmployeesPage() {
 
       {hasResults ? (
         <>
-          <EmployeeTable employees={data.data} onEdit={(emp) => setEditEmployee(emp)} />
+          <EmployeeTable
+            employees={data.data}
+            onEdit={(emp) => setEditEmployee(emp)}
+            onDelete={(emp) => setDeleteEmployee(emp)}
+          />
           <Pagination
             page={data.page}
             pageSize={data.pageSize}
@@ -132,6 +149,32 @@ export default function EmployeesPage() {
           )}
         </DialogContent>
       </Dialog>
+
+      <AlertDialog
+        open={Boolean(deleteEmployee)}
+        onOpenChange={(open) => !open && setDeleteEmployee(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete employee?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {deleteEmployee?.fullName} will be permanently removed.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (!deleteEmployee) return;
+                deleteMutation.mutate(deleteEmployee.id);
+                setDeleteEmployee(null);
+              }}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </main>
   );
 }
