@@ -6,3 +6,10 @@ export const loginInputSchema = z.object({
 });
 
 export type LoginInput = z.infer<typeof loginInputSchema>;
+
+export const meResponseSchema = z.object({
+  id: z.string(),
+  email: z.string().email(),
+});
+
+export type MeResponse = z.infer<typeof meResponseSchema>;
