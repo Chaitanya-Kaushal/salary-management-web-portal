@@ -112,6 +112,27 @@ describe('employees page', () => {
     );
   });
 
+  it('clicking add opens a dialog with form fields and validates required name', async () => {
+    server.use(
+      http.get('http://localhost:4000/employees', () =>
+        HttpResponse.json({ data: [], total: 0, page: 1, pageSize: 10 }),
+      ),
+    );
+
+    const user = userEvent.setup();
+    renderWithProviders(<EmployeesPage />);
+
+    await screen.findByText(/no employees/i);
+    await user.click(screen.getByRole('button', { name: /add employee/i }));
+
+    expect(await screen.findByRole('dialog')).toBeInTheDocument();
+    expect(screen.getByLabelText(/full name/i)).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /^create$/i }));
+
+    expect(await screen.findByText(/full name is required/i)).toBeInTheDocument();
+  });
+
   it('selecting a country filter pushes country param to the URL', async () => {
     const employees = [buildEmployee({ id: 'e1', fullName: 'Alice Anderson' })];
     server.use(
