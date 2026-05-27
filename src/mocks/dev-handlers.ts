@@ -57,10 +57,20 @@ function median(values: number[]): number {
   return sorted.length % 2 === 0 ? Math.round((sorted[mid - 1] + sorted[mid]) / 2) : sorted[mid];
 }
 
+const MOCK_TOKEN = 'dev-mock-token';
+
 export const devHandlers = [
-  http.post(`${API_BASE}/auth/login`, () => new HttpResponse(null, { status: 204 })),
+  http.post(`${API_BASE}/auth/login`, () =>
+    HttpResponse.json({ token: MOCK_TOKEN, user: devStore.hrUser }),
+  ),
   http.post(`${API_BASE}/auth/logout`, () => new HttpResponse(null, { status: 204 })),
-  http.get(`${API_BASE}/auth/me`, () => HttpResponse.json(devStore.hrUser)),
+  http.get(`${API_BASE}/auth/me`, ({ request }) => {
+    const auth = request.headers.get('authorization');
+    if (!auth?.startsWith('Bearer ')) {
+      return new HttpResponse(null, { status: 401 });
+    }
+    return HttpResponse.json(devStore.hrUser);
+  }),
 
   http.get(`${API_BASE}/employees`, ({ request }) => {
     const url = new URL(request.url);
