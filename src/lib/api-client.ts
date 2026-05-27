@@ -4,7 +4,10 @@ import axios, { type AxiosInstance } from 'axios';
 
 export const AUTH_TOKEN_KEY = 'salary_auth_token';
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000';
+const BASE_URL =
+  process.env.NODE_ENV === 'production'
+    ? (process.env.NEXT_PUBLIC_API_URL_PROD ?? 'http://localhost:4000')
+    : (process.env.NEXT_PUBLIC_API_URL_DEV ?? 'http://localhost:4000');
 
 function readToken(): string | null {
   if (typeof window === 'undefined') return null;
