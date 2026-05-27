@@ -15,11 +15,13 @@ Frontend for a salary management tool aimed at an HR Manager of an org with 10,0
 
 ## What it does
 
-- Login (JWT cookie-based auth, redirect on success)
+- Login (JWT cookie-based auth, redirect on success) with polished card UI and dark-mode-aware backdrop
 - Auth-gated routes via Next.js middleware
+- Home dashboard with welcome, quick-stat cards, recent additions and shortcuts
 - Employees list with pagination, search, and country/department/job-title filters (all URL-driven)
-- Add, edit, and delete employees (delete is optimistic)
-- Insights dashboard: summary tiles, salaries by country (min/max/avg/median), average salary by role with country selector
+- Add, edit, and delete employees (delete is optimistic). **The Edit dialog is the employee detail view** — clicking Edit on a row shows every field; no separate `/employees/[id]` page by design.
+- Insights dashboard: summary tiles (total employees, countries, top country, top role), salaries by country (min/max/avg/median) **in each country's own currency**, salary distribution chart per country, headcount by department, employment-type breakdown, and average salary by role with country selector.
+- Persistent navbar (brand, nav links, user menu, **light/dark theme toggle**) and footer across authenticated pages.
 
 ## Run locally
 
@@ -30,6 +32,10 @@ npm run dev
 ```
 
 The app expects a backend at the URL set by `NEXT_PUBLIC_API_URL` (default `http://localhost:4000`). The backend repo is at `salary-management-api-server`.
+
+### Run without a backend (dev mock mode)
+
+Add `NEXT_PUBLIC_API_MOCKING=true` to `.env.local` and restart `npm run dev`. The frontend will load an MSW service worker in the browser and intercept all API calls with realistic mock data (50 seeded employees across 5 countries). Login accepts any credentials. Auth middleware is bypassed while mocking is on. Useful for inspecting the UI before the real backend is up. **Production builds ignore this flag** — the worker is never started outside dev.
 
 ## Tests
 

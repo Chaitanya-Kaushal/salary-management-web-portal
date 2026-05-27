@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { Plus, Search, UserPlus } from 'lucide-react';
 import { useEmployees } from '@/hooks/use-employees';
 import { useUrlFilters } from '@/hooks/use-url-filters';
 import { useCreateEmployee } from '@/hooks/use-create-employee';
@@ -11,6 +12,9 @@ import { EmployeeFilters } from '@/components/employees/employee-filters';
 import { Pagination } from '@/components/employees/pagination';
 import { EmployeeForm, type EmployeeFormValues } from '@/components/employees/employee-form';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Dialog,
   DialogContent,
@@ -58,91 +62,117 @@ export default function EmployeesPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchInput]);
 
-  if (isLoading && !data) {
-    return (
-      <main className="flex min-h-screen items-center justify-center p-8">
-        <p role="status" aria-label="Loading employees" className="text-sm text-muted-foreground">
-          Loading employees…
-        </p>
-      </main>
-    );
-  }
-
   if (isError) {
     return (
-      <main className="flex min-h-screen items-center justify-center p-8">
-        <p role="alert" className="text-sm text-destructive">
-          Could not load employees. Please try again.
-        </p>
+      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-10 sm:px-6 lg:px-8">
+        <div className="rounded-lg border border-destructive/40 bg-destructive/5 p-6 text-center">
+          <p role="alert" className="text-sm text-destructive">
+            Could not load employees. Please try again.
+          </p>
+        </div>
       </main>
     );
   }
 
   const hasResults = data && data.data.length > 0;
+  const showLoadingSkeleton = isLoading && !data;
 
   return (
-    <main className="p-8">
-      <header className="mb-4 flex flex-wrap items-end justify-between gap-4">
+    <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-10 sm:px-6 lg:px-8">
+      <header className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold">Employees</h1>
-          <p className="text-sm text-muted-foreground">{data?.total ?? 0} total</p>
+          <h1 className="text-3xl font-bold tracking-tight">Employees</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {data ? `${data.total.toLocaleString()} total` : 'Loading…'}
+          </p>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
+        <Dialog open={addOpen} onOpenChange={setAddOpen}>
+          <DialogTrigger
+            render={
+              <Button>
+                <Plus className="mr-1 h-4 w-4" />
+                Add employee
+              </Button>
+            }
+          />
+          <DialogContent className="sm:max-w-lg">
+            <DialogHeader>
+              <DialogTitle>Add employee</DialogTitle>
+            </DialogHeader>
+            {createMutation.isError && (
+              <p role="alert" className="text-sm text-destructive">
+                Could not save employee. Please try again.
+              </p>
+            )}
+            <EmployeeForm
+              submitLabel="Create"
+              isPending={createMutation.isPending}
+              onSubmit={(values) =>
+                createMutation.mutate(values, {
+                  onSuccess: () => setAddOpen(false),
+                })
+              }
+            />
+          </DialogContent>
+        </Dialog>
+      </header>
+
+      <Card>
+        <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3 space-y-0">
           <EmployeeFilters
             country={filters.country}
             department={filters.department}
             jobTitle={filters.jobTitle}
             onChange={(next) => setFilters({ ...next, page: 1 })}
           />
-          <input
-            type="search"
-            placeholder="Search employees"
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            className="w-64 rounded border px-3 py-2 text-sm"
-          />
-          <Dialog open={addOpen} onOpenChange={setAddOpen}>
-            <DialogTrigger render={<Button>Add employee</Button>} />
-            <DialogContent className="sm:max-w-lg">
-              <DialogHeader>
-                <DialogTitle>Add employee</DialogTitle>
-              </DialogHeader>
-              {createMutation.isError && (
-                <p role="alert" className="text-sm text-destructive">
-                  Could not save employee. Please try again.
-                </p>
-              )}
-              <EmployeeForm
-                submitLabel="Create"
-                isPending={createMutation.isPending}
-                onSubmit={(values) =>
-                  createMutation.mutate(values, {
-                    onSuccess: () => setAddOpen(false),
-                  })
-                }
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              type="search"
+              placeholder="Search employees"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              className="w-64 pl-8"
+            />
+          </div>
+        </CardHeader>
+        <CardContent>
+          {showLoadingSkeleton ? (
+            <div role="status" aria-label="Loading employees" className="space-y-3">
+              <Skeleton className="h-8 w-full" />
+              <Skeleton className="h-8 w-full" />
+              <Skeleton className="h-8 w-full" />
+              <Skeleton className="h-8 w-full" />
+              <Skeleton className="h-8 w-full" />
+            </div>
+          ) : hasResults ? (
+            <>
+              <EmployeeTable
+                employees={data.data}
+                onEdit={(emp) => setEditEmployee(emp)}
+                onDelete={(emp) => setDeleteEmployee(emp)}
               />
-            </DialogContent>
-          </Dialog>
-        </div>
-      </header>
-
-      {hasResults ? (
-        <>
-          <EmployeeTable
-            employees={data.data}
-            onEdit={(emp) => setEditEmployee(emp)}
-            onDelete={(emp) => setDeleteEmployee(emp)}
-          />
-          <Pagination
-            page={data.page}
-            pageSize={data.pageSize}
-            total={data.total}
-            onPageChange={(nextPage) => setFilters({ page: nextPage })}
-          />
-        </>
-      ) : (
-        <p className="py-12 text-center text-muted-foreground">No employees match.</p>
-      )}
+              <Pagination
+                page={data.page}
+                pageSize={data.pageSize}
+                total={data.total}
+                onPageChange={(nextPage) => setFilters({ page: nextPage })}
+              />
+            </>
+          ) : (
+            <div className="flex flex-col items-center justify-center gap-3 py-12 text-center">
+              <span className="grid h-12 w-12 place-items-center rounded-full bg-muted text-muted-foreground">
+                <UserPlus className="h-5 w-5" />
+              </span>
+              <p className="text-sm text-muted-foreground">No employees match.</p>
+              <Button variant="outline" size="sm" onClick={() => setAddOpen(true)}>
+                <Plus className="mr-1 h-4 w-4" />
+                Add an employee
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       <Dialog open={Boolean(editEmployee)} onOpenChange={(open) => !open && setEditEmployee(null)}>
         <DialogContent className="sm:max-w-lg">

@@ -10,6 +10,7 @@ export type LoginInput = z.infer<typeof loginInputSchema>;
 export const meResponseSchema = z.object({
   id: z.string(),
   email: z.string().email(),
+  name: z.string().optional(),
 });
 
 export type MeResponse = z.infer<typeof meResponseSchema>;
@@ -55,6 +56,7 @@ export type InsightsSummary = z.infer<typeof insightsSummarySchema>;
 export const insightsByCountrySchema = z.array(
   z.object({
     country: z.string(),
+    currency: z.string(),
     count: z.number(),
     min: z.number(),
     max: z.number(),
@@ -75,3 +77,21 @@ export const insightsByJobTitleSchema = z.array(
 );
 
 export type InsightsByJobTitle = z.infer<typeof insightsByJobTitleSchema>;
+
+export const insightsByDepartmentSchema = z.array(
+  z.object({
+    department: z.string(),
+    count: z.number(),
+  }),
+);
+
+export type InsightsByDepartment = z.infer<typeof insightsByDepartmentSchema>;
+
+export const insightsByEmploymentTypeSchema = z.array(
+  z.object({
+    employmentType: employmentTypeSchema,
+    count: z.number(),
+  }),
+);
+
+export type InsightsByEmploymentType = z.infer<typeof insightsByEmploymentTypeSchema>;
