@@ -170,6 +170,24 @@ describe('employees page', () => {
     });
   });
 
+  it('clicking edit opens a dialog pre-filled with the row data', async () => {
+    const employee = buildEmployee({ id: 'e1', fullName: 'Alice Anderson' });
+    server.use(
+      http.get('http://localhost:4000/employees', () =>
+        HttpResponse.json({ data: [employee], total: 1, page: 1, pageSize: 10 }),
+      ),
+    );
+
+    const user = userEvent.setup();
+    renderWithProviders(<EmployeesPage />);
+    await screen.findByText('Alice Anderson');
+
+    await user.click(screen.getByRole('button', { name: /edit alice anderson/i }));
+
+    const dialog = await screen.findByRole('dialog');
+    expect(within(dialog).getByLabelText(/full name/i)).toHaveValue('Alice Anderson');
+  });
+
   it('selecting a country filter pushes country param to the URL', async () => {
     const employees = [buildEmployee({ id: 'e1', fullName: 'Alice Anderson' })];
     server.use(
