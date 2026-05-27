@@ -7,6 +7,7 @@ import { EmployeeTable } from '@/components/employees/employee-table';
 import { EmployeeFilters } from '@/components/employees/employee-filters';
 import { Pagination } from '@/components/employees/pagination';
 import { EmployeeForm } from '@/components/employees/employee-form';
+import { useCreateEmployee } from '@/hooks/use-create-employee';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -25,6 +26,7 @@ export default function EmployeesPage() {
   const [searchInput, setSearchInput] = useState(filters.search ?? '');
   const firstRender = useRef(true);
   const [addOpen, setAddOpen] = useState(false);
+  const createMutation = useCreateEmployee();
 
   useEffect(() => {
     if (firstRender.current) {
@@ -79,9 +81,12 @@ export default function EmployeesPage() {
               </DialogHeader>
               <EmployeeForm
                 submitLabel="Create"
-                onSubmit={() => {
-                  setAddOpen(false);
-                }}
+                isPending={createMutation.isPending}
+                onSubmit={(values) =>
+                  createMutation.mutate(values, {
+                    onSuccess: () => setAddOpen(false),
+                  })
+                }
               />
             </DialogContent>
           </Dialog>
