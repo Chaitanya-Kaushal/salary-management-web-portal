@@ -1,18 +1,10 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
-import { apiClient } from '@/lib/api-client';
+import { useEmployees } from '@/hooks/use-employees';
 import { EmployeeTable } from '@/components/employees/employee-table';
-import type { EmployeeListResponse } from '@/lib/api-contract';
 
 export default function EmployeesPage() {
-  const { data, isLoading } = useQuery({
-    queryKey: ['employees'],
-    queryFn: async (): Promise<EmployeeListResponse> => {
-      const res = await apiClient.get<EmployeeListResponse>('/employees');
-      return res.data;
-    },
-  });
+  const { data, isLoading } = useEmployees();
 
   if (isLoading) {
     return (
