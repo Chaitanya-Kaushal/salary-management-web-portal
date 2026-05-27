@@ -34,7 +34,7 @@ const SEARCH_DEBOUNCE_MS = 300;
 
 export default function EmployeesPage() {
   const { filters, setFilters } = useUrlFilters();
-  const { data, isLoading } = useEmployees(filters);
+  const { data, isLoading, isError } = useEmployees(filters);
 
   const [searchInput, setSearchInput] = useState(filters.search ?? '');
   const firstRender = useRef(true);
@@ -63,6 +63,16 @@ export default function EmployeesPage() {
       <main className="flex min-h-screen items-center justify-center p-8">
         <p role="status" aria-label="Loading employees" className="text-sm text-muted-foreground">
           Loading employees…
+        </p>
+      </main>
+    );
+  }
+
+  if (isError) {
+    return (
+      <main className="flex min-h-screen items-center justify-center p-8">
+        <p role="alert" className="text-sm text-destructive">
+          Could not load employees. Please try again.
         </p>
       </main>
     );

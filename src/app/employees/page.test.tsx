@@ -47,10 +47,7 @@ describe('employees page', () => {
 
   it('shows an error state when the api returns 500', async () => {
     server.use(
-      http.get(
-        'http://localhost:4000/employees',
-        () => new HttpResponse(null, { status: 500 }),
-      ),
+      http.get('http://localhost:4000/employees', () => new HttpResponse(null, { status: 500 })),
     );
 
     renderWithProviders(<EmployeesPage />);
