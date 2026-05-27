@@ -3,11 +3,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { useEmployees } from '@/hooks/use-employees';
 import { useUrlFilters } from '@/hooks/use-url-filters';
+import { useCreateEmployee } from '@/hooks/use-create-employee';
+import { useUpdateEmployee } from '@/hooks/use-update-employee';
 import { EmployeeTable } from '@/components/employees/employee-table';
 import { EmployeeFilters } from '@/components/employees/employee-filters';
 import { Pagination } from '@/components/employees/pagination';
-import { EmployeeForm } from '@/components/employees/employee-form';
-import { useCreateEmployee } from '@/hooks/use-create-employee';
+import { EmployeeForm, type EmployeeFormValues } from '@/components/employees/employee-form';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -16,6 +17,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import type { Employee } from '@/lib/api-contract';
 
 const SEARCH_DEBOUNCE_MS = 300;
 
@@ -26,7 +28,10 @@ export default function EmployeesPage() {
   const [searchInput, setSearchInput] = useState(filters.search ?? '');
   const firstRender = useRef(true);
   const [addOpen, setAddOpen] = useState(false);
+  const [editEmployee, setEditEmployee] = useState<Employee | null>(null);
+
   const createMutation = useCreateEmployee();
+  const updateMutation = useUpdateEmployee();
 
   useEffect(() => {
     if (firstRender.current) {
@@ -95,7 +100,7 @@ export default function EmployeesPage() {
 
       {hasResults ? (
         <>
-          <EmployeeTable employees={data.data} />
+          <EmployeeTable employees={data.data} onEdit={(emp) => setEditEmployee(emp)} />
           <Pagination
             page={data.page}
             pageSize={data.pageSize}
@@ -106,6 +111,41 @@ export default function EmployeesPage() {
       ) : (
         <p className="py-12 text-center text-muted-foreground">No employees match.</p>
       )}
+
+      <Dialog open={Boolean(editEmployee)} onOpenChange={(open) => !open && setEditEmployee(null)}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Edit employee</DialogTitle>
+          </DialogHeader>
+          {editEmployee && (
+            <EmployeeForm
+              defaultValues={toFormValues(editEmployee)}
+              submitLabel="Save"
+              isPending={updateMutation.isPending}
+              onSubmit={(values) =>
+                updateMutation.mutate(
+                  { id: editEmployee.id, values },
+                  { onSuccess: () => setEditEmployee(null) },
+                )
+              }
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </main>
   );
+}
+
+function toFormValues(e: Employee): EmployeeFormValues {
+  return {
+    fullName: e.fullName,
+    email: e.email,
+    jobTitle: e.jobTitle,
+    department: e.department,
+    country: e.country,
+    currency: e.currency,
+    salary: e.salary,
+    employmentType: e.employmentType,
+    hireDate: e.hireDate.slice(0, 10),
+  };
 }
