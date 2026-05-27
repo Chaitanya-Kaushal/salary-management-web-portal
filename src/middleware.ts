@@ -2,8 +2,13 @@ import { NextResponse, type NextRequest } from 'next/server';
 
 const PUBLIC_ROUTES = ['/login'];
 const AUTH_COOKIE = 'auth';
+const MOCKING_ENABLED = process.env.NEXT_PUBLIC_API_MOCKING === 'true';
 
 export function middleware(req: NextRequest) {
+  if (MOCKING_ENABLED) {
+    return NextResponse.next();
+  }
+
   const { pathname } = req.nextUrl;
 
   if (PUBLIC_ROUTES.includes(pathname)) {

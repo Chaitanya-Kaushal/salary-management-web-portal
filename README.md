@@ -31,6 +31,10 @@ npm run dev
 
 The app expects a backend at the URL set by `NEXT_PUBLIC_API_URL` (default `http://localhost:4000`). The backend repo is at `salary-management-api-server`.
 
+### Run without a backend (dev mock mode)
+
+Add `NEXT_PUBLIC_API_MOCKING=true` to `.env.local` and restart `npm run dev`. The frontend will load an MSW service worker in the browser and intercept all API calls with realistic mock data (50 seeded employees across 5 countries). Login accepts any credentials. Auth middleware is bypassed while mocking is on. Useful for inspecting the UI before the real backend is up. **Production builds ignore this flag** — the worker is never started outside dev.
+
 ## Tests
 
 ```bash
