@@ -21,7 +21,7 @@ function renderWithProviders(ui: React.ReactNode) {
 }
 
 describe('navbar', () => {
-  it('renders brand, nav links, theme toggle, and user email', async () => {
+  it('renders brand, nav links, theme toggle, user, and sign out', async () => {
     server.use(
       http.get('http://localhost:4000/auth/me', () =>
         HttpResponse.json({ id: 'u1', email: 'hr@corp.example' }),
@@ -36,5 +36,18 @@ describe('navbar', () => {
     expect(screen.getByRole('link', { name: /^insights$/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /toggle theme/i })).toBeInTheDocument();
     expect(await screen.findByText('hr@corp.example')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /sign out/i })).toBeInTheDocument();
+  });
+
+  it('prefers the user name over email when available', async () => {
+    server.use(
+      http.get('http://localhost:4000/auth/me', () =>
+        HttpResponse.json({ id: 'u1', email: 'hr@corp.example', name: 'Priya Sharma' }),
+      ),
+    );
+
+    renderWithProviders(<Navbar />);
+
+    expect(await screen.findByText('Priya Sharma')).toBeInTheDocument();
   });
 });

@@ -10,6 +10,7 @@ export type LoginInput = z.infer<typeof loginInputSchema>;
 export const meResponseSchema = z.object({
   id: z.string(),
   email: z.string().email(),
+  name: z.string().optional(),
 });
 
 export type MeResponse = z.infer<typeof meResponseSchema>;
