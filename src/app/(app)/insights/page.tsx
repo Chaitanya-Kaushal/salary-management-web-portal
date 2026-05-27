@@ -5,11 +5,13 @@ import { useInsightsSummary } from '@/hooks/use-insights-summary';
 import { useInsightsByCountry } from '@/hooks/use-insights-by-country';
 import { useInsightsByJobTitle } from '@/hooks/use-insights-by-job-title';
 import { useInsightsByDepartment } from '@/hooks/use-insights-by-department';
+import { useInsightsByEmploymentType } from '@/hooks/use-insights-by-employment-type';
 import { SummaryTiles } from '@/components/insights/summary-tiles';
 import { ByCountryCards } from '@/components/insights/by-country-cards';
 import { ByJobTitleTable } from '@/components/insights/by-job-title-table';
 import { DistributionChart } from '@/components/insights/distribution-chart';
 import { HeadcountByDepartment } from '@/components/insights/headcount-by-department';
+import { EmploymentTypeBreakdown } from '@/components/insights/employment-type-breakdown';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function InsightsPage() {
@@ -18,6 +20,7 @@ export default function InsightsPage() {
   const [selectedCountry, setSelectedCountry] = useState<string | undefined>();
   const { data: byJobTitle } = useInsightsByJobTitle(selectedCountry);
   const { data: byDepartment } = useInsightsByDepartment();
+  const { data: byEmploymentType } = useInsightsByEmploymentType();
 
   const distributionCountry =
     byCountry?.find((c) => c.country === selectedCountry) ?? byCountry?.[0];
@@ -66,17 +69,31 @@ export default function InsightsPage() {
         </Card>
       )}
 
-      {byDepartment && byDepartment.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Headcount by department</CardTitle>
-            <CardDescription>How many employees in each department.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <HeadcountByDepartment data={byDepartment} />
-          </CardContent>
-        </Card>
-      )}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        {byDepartment && byDepartment.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Headcount by department</CardTitle>
+              <CardDescription>How many employees in each department.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <HeadcountByDepartment data={byDepartment} />
+            </CardContent>
+          </Card>
+        )}
+
+        {byEmploymentType && byEmploymentType.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Employment type</CardTitle>
+              <CardDescription>Workforce composition by employment type.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <EmploymentTypeBreakdown data={byEmploymentType} />
+            </CardContent>
+          </Card>
+        )}
+      </div>
 
       {byJobTitle && byJobTitle.length > 0 && (
         <Card>

@@ -138,7 +138,7 @@ describe('insights page', () => {
 
     renderWithProviders(<InsightsPage />);
 
-    expect(await screen.findByText(/employment type/i)).toBeInTheDocument();
+    expect(await screen.findByText('Employment type')).toBeInTheDocument();
     expect(await screen.findByText(/full[- ]time/i)).toBeInTheDocument();
     expect(await screen.findByText(/part[- ]time/i)).toBeInTheDocument();
     expect(await screen.findByText(/contractor/i)).toBeInTheDocument();
