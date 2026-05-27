@@ -5,14 +5,6 @@ import { usePathname } from 'next/navigation';
 import { Wallet2, LogOut } from 'lucide-react';
 import { useMe } from '@/hooks/use-me';
 import { useLogout } from '@/hooks/use-logout';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { ThemeToggle } from './theme-toggle';
 import { cn } from '@/lib/utils';
 
@@ -27,8 +19,11 @@ export function Navbar() {
   const { data: user } = useMe();
   const logout = useLogout();
 
+  const displayName = user?.name ?? user?.email ?? '';
+  const initial = displayName ? displayName[0] : '';
+
   return (
-    <header className="sticky top-0 z-30 w-full border-b bg-background/80 backdrop-blur-md">
+    <header className="sticky top-0 z-30 w-full border-b border-primary/10 bg-primary/5 backdrop-blur-md">
       <div className="mx-auto flex h-14 max-w-7xl items-center gap-6 px-4 sm:px-6 lg:px-8">
         <Link
           href="/"
@@ -51,8 +46,8 @@ export function Navbar() {
                 className={cn(
                   'rounded-md px-3 py-1.5 text-sm transition-colors',
                   active
-                    ? 'bg-primary/10 text-primary'
-                    : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                    ? 'bg-primary/15 text-primary'
+                    : 'text-muted-foreground hover:bg-primary/10 hover:text-foreground',
                 )}
               >
                 {item.label}
@@ -65,32 +60,27 @@ export function Navbar() {
           <ThemeToggle />
           {user && (
             <>
-              <span
-                aria-label="Signed in as"
-                className="hidden select-none text-sm text-muted-foreground sm:inline"
-              >
-                {user.email}
-              </span>
-              <DropdownMenu>
-                <DropdownMenuTrigger
-                  type="button"
-                  aria-label="Open user menu"
-                  className="grid h-8 w-8 place-items-center rounded-full bg-primary/15 text-xs font-semibold uppercase text-primary outline-none transition-colors hover:bg-primary/25 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              <div className="flex items-center gap-2 rounded-full border border-primary/10 bg-background/60 py-1 pl-1 pr-3">
+                <span
+                  aria-hidden
+                  className="grid h-7 w-7 place-items-center rounded-full bg-primary text-xs font-semibold uppercase text-primary-foreground shadow-sm"
                 >
-                  {user.email[0]}
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuLabel className="text-xs text-muted-foreground">
-                    Signed in as
-                  </DropdownMenuLabel>
-                  <DropdownMenuLabel>{user.email}</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => logout.mutate()} disabled={logout.isPending}>
-                    <LogOut />
-                    Sign out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                  {initial}
+                </span>
+                <span className="hidden text-sm font-medium text-foreground sm:inline">
+                  {displayName}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => logout.mutate()}
+                disabled={logout.isPending}
+                aria-label="Sign out"
+                title="Sign out"
+                className="grid h-8 w-8 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive disabled:opacity-60"
+              >
+                <LogOut className="h-4 w-4" />
+              </button>
             </>
           )}
         </div>

@@ -96,5 +96,5 @@ function generateEmployees(count: number): Employee[] {
 
 export const devStore = {
   employees: generateEmployees(50),
-  hrUser: { id: 'hr-1', email: 'hr@corp.example' },
+  hrUser: { id: 'hr-1', email: 'hr@corp.example', name: 'Priya Sharma' },
 };
