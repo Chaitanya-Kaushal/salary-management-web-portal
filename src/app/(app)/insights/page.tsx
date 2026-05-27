@@ -4,10 +4,12 @@ import { useState } from 'react';
 import { useInsightsSummary } from '@/hooks/use-insights-summary';
 import { useInsightsByCountry } from '@/hooks/use-insights-by-country';
 import { useInsightsByJobTitle } from '@/hooks/use-insights-by-job-title';
+import { useInsightsByDepartment } from '@/hooks/use-insights-by-department';
 import { SummaryTiles } from '@/components/insights/summary-tiles';
 import { ByCountryCards } from '@/components/insights/by-country-cards';
 import { ByJobTitleTable } from '@/components/insights/by-job-title-table';
 import { DistributionChart } from '@/components/insights/distribution-chart';
+import { HeadcountByDepartment } from '@/components/insights/headcount-by-department';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function InsightsPage() {
@@ -15,6 +17,7 @@ export default function InsightsPage() {
   const { data: byCountry } = useInsightsByCountry();
   const [selectedCountry, setSelectedCountry] = useState<string | undefined>();
   const { data: byJobTitle } = useInsightsByJobTitle(selectedCountry);
+  const { data: byDepartment } = useInsightsByDepartment();
 
   const distributionCountry =
     byCountry?.find((c) => c.country === selectedCountry) ?? byCountry?.[0];
@@ -59,6 +62,18 @@ export default function InsightsPage() {
           </CardHeader>
           <CardContent>
             <DistributionChart bands={distributionCountry.bands} />
+          </CardContent>
+        </Card>
+      )}
+
+      {byDepartment && byDepartment.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Headcount by department</CardTitle>
+            <CardDescription>How many employees in each department.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <HeadcountByDepartment data={byDepartment} />
           </CardContent>
         </Card>
       )}

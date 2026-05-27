@@ -4,6 +4,8 @@ import type {
   Employee,
   EmploymentType,
   InsightsByCountry,
+  InsightsByDepartment,
+  InsightsByEmploymentType,
   InsightsByJobTitle,
   InsightsSummary,
 } from '@/lib/api-contract';
@@ -140,6 +142,24 @@ export const devHandlers = [
         bands: salaryBands(salaries),
       };
     });
+    return HttpResponse.json(result);
+  }),
+
+  http.get(`${API_BASE}/insights/by-department`, () => {
+    const groups = groupBy(devStore.employees, (e) => e.department);
+    const result: InsightsByDepartment = Object.entries(groups)
+      .map(([department, list]) => ({ department, count: list.length }))
+      .sort((a, b) => b.count - a.count);
+    return HttpResponse.json(result);
+  }),
+
+  http.get(`${API_BASE}/insights/by-employment-type`, () => {
+    const groups = groupBy(devStore.employees, (e) => e.employmentType);
+    const result: InsightsByEmploymentType = (
+      Object.entries(groups) as [EmploymentType, Employee[]][]
+    )
+      .map(([employmentType, list]) => ({ employmentType, count: list.length }))
+      .sort((a, b) => b.count - a.count);
     return HttpResponse.json(result);
   }),
 
