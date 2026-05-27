@@ -24,7 +24,7 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-30 w-full border-b border-primary/10 bg-primary/5 backdrop-blur-md">
-      <div className="mx-auto flex h-14 max-w-7xl items-center gap-6 px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex h-14 max-w-7xl items-center gap-3 px-3 sm:gap-6 sm:px-6 lg:px-8">
         <Link
           href="/"
           className="flex items-center gap-2 text-sm font-semibold tracking-tight"
@@ -44,7 +44,7 @@ export function Navbar() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  'rounded-md px-3 py-1.5 text-sm transition-colors',
+                  'rounded-md px-2 py-1.5 text-sm transition-colors sm:px-3',
                   active
                     ? 'bg-primary/15 text-primary'
                     : 'text-muted-foreground hover:bg-primary/10 hover:text-foreground',
@@ -56,11 +56,11 @@ export function Navbar() {
           })}
         </nav>
 
-        <div className="ml-auto flex items-center gap-3">
+        <div className="ml-auto flex items-center gap-1.5 sm:gap-3">
           <ThemeToggle />
           {user && (
             <>
-              <div className="flex items-center gap-2 rounded-full border border-primary/10 bg-background/60 py-1 pl-1 pr-3">
+              <div className="flex items-center gap-2 rounded-full border border-primary/10 bg-background/60 py-1 pl-1 pr-1 sm:pr-3">
                 <span
                   aria-hidden
                   className="grid h-7 w-7 place-items-center rounded-full bg-primary text-xs font-semibold uppercase text-primary-foreground shadow-sm"
