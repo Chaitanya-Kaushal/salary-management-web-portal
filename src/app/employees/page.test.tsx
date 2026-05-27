@@ -188,6 +188,33 @@ describe('employees page', () => {
     expect(within(dialog).getByLabelText(/full name/i)).toHaveValue('Alice Anderson');
   });
 
+  it('clicking delete confirms then calls DELETE for the employee', async () => {
+    let deletedId: string | null = null;
+    const employee = buildEmployee({ id: 'e1', fullName: 'Alice Anderson' });
+    server.use(
+      http.get('http://localhost:4000/employees', () =>
+        HttpResponse.json({ data: [employee], total: 1, page: 1, pageSize: 10 }),
+      ),
+      http.delete('http://localhost:4000/employees/:id', ({ params }) => {
+        deletedId = params.id as string;
+        return new HttpResponse(null, { status: 204 });
+      }),
+    );
+
+    const user = userEvent.setup();
+    renderWithProviders(<EmployeesPage />);
+    await screen.findByText('Alice Anderson');
+
+    await user.click(screen.getByRole('button', { name: /delete alice anderson/i }));
+
+    const confirmDialog = await screen.findByRole('alertdialog');
+    await user.click(within(confirmDialog).getByRole('button', { name: /^delete$/i }));
+
+    await waitFor(() => {
+      expect(deletedId).toBe('e1');
+    });
+  });
+
   it('selecting a country filter pushes country param to the URL', async () => {
     const employees = [buildEmployee({ id: 'e1', fullName: 'Alice Anderson' })];
     server.use(
