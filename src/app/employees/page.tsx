@@ -6,6 +6,15 @@ import { useUrlFilters } from '@/hooks/use-url-filters';
 import { EmployeeTable } from '@/components/employees/employee-table';
 import { EmployeeFilters } from '@/components/employees/employee-filters';
 import { Pagination } from '@/components/employees/pagination';
+import { EmployeeForm } from '@/components/employees/employee-form';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 
 const SEARCH_DEBOUNCE_MS = 300;
 
@@ -15,6 +24,7 @@ export default function EmployeesPage() {
 
   const [searchInput, setSearchInput] = useState(filters.search ?? '');
   const firstRender = useRef(true);
+  const [addOpen, setAddOpen] = useState(false);
 
   useEffect(() => {
     if (firstRender.current) {
@@ -61,6 +71,20 @@ export default function EmployeesPage() {
             onChange={(e) => setSearchInput(e.target.value)}
             className="w-64 rounded border px-3 py-2 text-sm"
           />
+          <Dialog open={addOpen} onOpenChange={setAddOpen}>
+            <DialogTrigger render={<Button>Add employee</Button>} />
+            <DialogContent className="sm:max-w-lg">
+              <DialogHeader>
+                <DialogTitle>Add employee</DialogTitle>
+              </DialogHeader>
+              <EmployeeForm
+                submitLabel="Create"
+                onSubmit={() => {
+                  setAddOpen(false);
+                }}
+              />
+            </DialogContent>
+          </Dialog>
         </div>
       </header>
 
