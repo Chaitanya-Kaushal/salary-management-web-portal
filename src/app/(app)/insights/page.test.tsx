@@ -74,6 +74,38 @@ describe('insights page', () => {
     expect(usCard?.textContent).toMatch(/\$|USD/);
   });
 
+  it('renders salary distribution chart with band labels and counts', async () => {
+    server.use(
+      summaryHandler(),
+      http.get('http://localhost:4000/insights/by-country', () =>
+        HttpResponse.json([
+          {
+            country: 'US',
+            currency: 'USD',
+            count: 50,
+            min: 0,
+            max: 0,
+            avg: 0,
+            median: 0,
+            bands: [
+              { label: '< 50k', count: 5 },
+              { label: '50k–100k', count: 15 },
+              { label: '100k–200k', count: 20 },
+              { label: '> 200k', count: 10 },
+            ],
+          },
+        ]),
+      ),
+    );
+
+    renderWithProviders(<InsightsPage />);
+
+    expect(await screen.findByText('< 50k')).toBeInTheDocument();
+    expect(await screen.findByText('50k–100k')).toBeInTheDocument();
+    expect(await screen.findByText('100k–200k')).toBeInTheDocument();
+    expect(await screen.findByText('> 200k')).toBeInTheDocument();
+  });
+
   it('renders average salary by job title', async () => {
     server.use(
       summaryHandler(),
