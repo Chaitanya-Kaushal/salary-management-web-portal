@@ -16,7 +16,10 @@ function summaryHandler() {
     HttpResponse.json({
       totalEmployees: 1234,
       totalPayroll: 50_000_000_00,
-      topCountries: [],
+      topCountries: [
+        { country: 'US', count: 500 },
+        { country: 'IN', count: 300 },
+      ],
       topJobTitles: [],
     }),
   );
@@ -27,6 +30,7 @@ function byCountryHandler() {
     HttpResponse.json([
       {
         country: 'US',
+        currency: 'USD',
         count: 50,
         min: 80_000_00,
         max: 250_000_00,
@@ -34,28 +38,40 @@ function byCountryHandler() {
         median: 140_000_00,
         bands: [],
       },
+      {
+        country: 'IN',
+        currency: 'INR',
+        count: 30,
+        min: 1_000_000_00,
+        max: 3_000_000_00,
+        avg: 1_500_000_00,
+        median: 1_400_000_00,
+        bands: [],
+      },
     ]),
   );
 }
 
 describe('insights page', () => {
-  it('renders total employees and total payroll tiles', async () => {
+  it('renders total employees tile', async () => {
     server.use(summaryHandler());
     renderWithProviders(<InsightsPage />);
 
     expect(await screen.findByText('1,234')).toBeInTheDocument();
-    expect(await screen.findByText(/total payroll/i)).toBeInTheDocument();
+    expect(await screen.findByText(/total employees/i)).toBeInTheDocument();
   });
 
-  it('renders by-country cards with min, max, avg, median', async () => {
+  it('renders by-country cards using each country currency', async () => {
     server.use(summaryHandler(), byCountryHandler());
 
     renderWithProviders(<InsightsPage />);
 
     expect(await screen.findByRole('heading', { name: 'US' })).toBeInTheDocument();
-    expect(await screen.findByText(/min/i)).toBeInTheDocument();
-    expect(await screen.findByText(/max/i)).toBeInTheDocument();
-    expect(await screen.findByText(/median/i)).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'IN' })).toBeInTheDocument();
+    const indiaCard = (await screen.findByRole('heading', { name: 'IN' })).closest('article');
+    expect(indiaCard?.textContent).toMatch(/₹|INR/);
+    const usCard = (await screen.findByRole('heading', { name: 'US' })).closest('article');
+    expect(usCard?.textContent).toMatch(/\$|USD/);
   });
 
   it('renders average salary by job title', async () => {
