@@ -1,12 +1,15 @@
 'use client';
 
 import { useEmployees } from '@/hooks/use-employees';
+import { useUrlFilters } from '@/hooks/use-url-filters';
 import { EmployeeTable } from '@/components/employees/employee-table';
+import { Pagination } from '@/components/employees/pagination';
 
 export default function EmployeesPage() {
-  const { data, isLoading } = useEmployees();
+  const { filters, setFilters } = useUrlFilters();
+  const { data, isLoading } = useEmployees(filters);
 
-  if (isLoading) {
+  if (isLoading && !data) {
     return (
       <main className="flex min-h-screen items-center justify-center p-8">
         <p role="status" aria-label="Loading employees" className="text-sm text-muted-foreground">
@@ -16,7 +19,7 @@ export default function EmployeesPage() {
     );
   }
 
-  if (!data || data.data.length === 0) {
+  if (!data || data.total === 0) {
     return (
       <main className="flex min-h-screen items-center justify-center p-8">
         <p className="text-muted-foreground">No employees yet.</p>
@@ -33,6 +36,12 @@ export default function EmployeesPage() {
         </div>
       </header>
       <EmployeeTable employees={data.data} />
+      <Pagination
+        page={data.page}
+        pageSize={data.pageSize}
+        total={data.total}
+        onPageChange={(nextPage) => setFilters({ page: nextPage })}
+      />
     </main>
   );
 }

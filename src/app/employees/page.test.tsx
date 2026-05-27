@@ -87,9 +87,7 @@ describe('employees page', () => {
 
     renderWithProviders(<EmployeesPage />);
 
-    expect(
-      await screen.findByRole('status', { name: /loading employees/i }),
-    ).toBeInTheDocument();
+    expect(await screen.findByRole('status', { name: /loading employees/i })).toBeInTheDocument();
   });
 
   it('clicking next pushes page=2 to the URL', async () => {
