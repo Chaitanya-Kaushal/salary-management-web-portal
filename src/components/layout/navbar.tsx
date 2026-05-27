@@ -5,7 +5,6 @@ import { usePathname } from 'next/navigation';
 import { Wallet2, LogOut } from 'lucide-react';
 import { useMe } from '@/hooks/use-me';
 import { useLogout } from '@/hooks/use-logout';
-import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -74,20 +73,12 @@ export function Navbar() {
               </span>
               <DropdownMenu>
                 <DropdownMenuTrigger
-                  render={
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon-sm"
-                      aria-label="Open user menu"
-                      className="rounded-full"
-                    >
-                      <span className="grid h-7 w-7 place-items-center rounded-full bg-primary/15 text-xs font-semibold uppercase text-primary">
-                        {user.email[0]}
-                      </span>
-                    </Button>
-                  }
-                />
+                  type="button"
+                  aria-label="Open user menu"
+                  className="grid h-8 w-8 place-items-center rounded-full bg-primary/15 text-xs font-semibold uppercase text-primary outline-none transition-colors hover:bg-primary/25 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                >
+                  {user.email[0]}
+                </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
                   <DropdownMenuLabel className="text-xs text-muted-foreground">
                     Signed in as
