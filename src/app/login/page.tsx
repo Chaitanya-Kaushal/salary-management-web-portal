@@ -1,22 +1,17 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { apiClient } from '@/lib/api-client';
+import type { LoginInput } from '@/lib/api-contract';
+import { useLogin } from '@/hooks/use-login';
 
 const schema = z.object({
   email: z.string().email('Invalid email'),
   password: z.string().min(1, 'Password is required'),
 });
 
-type LoginInput = z.infer<typeof schema>;
-
 export default function LoginPage() {
-  const router = useRouter();
-
   const {
     register,
     handleSubmit,
@@ -25,11 +20,7 @@ export default function LoginPage() {
     resolver: zodResolver(schema),
   });
 
-  const loginMutation = useMutation({
-    mutationFn: (data: LoginInput) => apiClient.post('/auth/login', data),
-    onSuccess: () => router.push('/employees'),
-  });
-
+  const loginMutation = useLogin();
   const onSubmit = (data: LoginInput) => loginMutation.mutate(data);
 
   return (
