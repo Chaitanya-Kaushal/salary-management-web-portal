@@ -33,7 +33,7 @@ export default function HomePage() {
         </div>
         <h1 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
           Welcome back{user ? ',' : ''}{' '}
-          {user ? <span className="text-primary">{user.email}</span> : null}
+          {user ? <span className="text-primary">{user.name ?? user.email}</span> : null}
         </h1>
         <p className="mt-2 max-w-xl text-muted-foreground">
           A quick look at your organisation. Browse employees or dive into the salary insights.
