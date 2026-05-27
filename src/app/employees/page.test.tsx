@@ -185,10 +185,7 @@ describe('employees page', () => {
       http.get('http://localhost:4000/employees', () =>
         HttpResponse.json({ data: [], total: 0, page: 1, pageSize: 10 }),
       ),
-      http.post(
-        'http://localhost:4000/employees',
-        () => new HttpResponse(null, { status: 500 }),
-      ),
+      http.post('http://localhost:4000/employees', () => new HttpResponse(null, { status: 500 })),
     );
 
     const user = userEvent.setup();

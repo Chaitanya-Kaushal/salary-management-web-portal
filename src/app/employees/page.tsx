@@ -107,6 +107,11 @@ export default function EmployeesPage() {
               <DialogHeader>
                 <DialogTitle>Add employee</DialogTitle>
               </DialogHeader>
+              {createMutation.isError && (
+                <p role="alert" className="text-sm text-destructive">
+                  Could not save employee. Please try again.
+                </p>
+              )}
               <EmployeeForm
                 submitLabel="Create"
                 isPending={createMutation.isPending}
@@ -144,6 +149,11 @@ export default function EmployeesPage() {
           <DialogHeader>
             <DialogTitle>Edit employee</DialogTitle>
           </DialogHeader>
+          {updateMutation.isError && (
+            <p role="alert" className="text-sm text-destructive">
+              Could not save employee. Please try again.
+            </p>
+          )}
           {editEmployee && (
             <EmployeeForm
               defaultValues={toFormValues(editEmployee)}
