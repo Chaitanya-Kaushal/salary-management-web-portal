@@ -6,13 +6,23 @@ import { EmployeeTable } from '@/components/employees/employee-table';
 import type { EmployeeListResponse } from '@/lib/api-contract';
 
 export default function EmployeesPage() {
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ['employees'],
     queryFn: async (): Promise<EmployeeListResponse> => {
       const res = await apiClient.get<EmployeeListResponse>('/employees');
       return res.data;
     },
   });
+
+  if (isLoading) {
+    return (
+      <main className="flex min-h-screen items-center justify-center p-8">
+        <p role="status" aria-label="Loading employees" className="text-sm text-muted-foreground">
+          Loading employees…
+        </p>
+      </main>
+    );
+  }
 
   if (!data || data.data.length === 0) {
     return (

@@ -72,8 +72,6 @@ describe('employees page', () => {
 
     renderWithProviders(<EmployeesPage />);
 
-    expect(
-      await screen.findByRole('status', { name: /loading employees/i }),
-    ).toBeInTheDocument();
+    expect(await screen.findByRole('status', { name: /loading employees/i })).toBeInTheDocument();
   });
 });
