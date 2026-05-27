@@ -180,6 +180,37 @@ describe('employees page', () => {
     });
   });
 
+  it('shows a server error in the add dialog when create fails', async () => {
+    server.use(
+      http.get('http://localhost:4000/employees', () =>
+        HttpResponse.json({ data: [], total: 0, page: 1, pageSize: 10 }),
+      ),
+      http.post(
+        'http://localhost:4000/employees',
+        () => new HttpResponse(null, { status: 500 }),
+      ),
+    );
+
+    const user = userEvent.setup();
+    renderWithProviders(<EmployeesPage />);
+    await screen.findByText(/no employees/i);
+
+    await user.click(screen.getByRole('button', { name: /add employee/i }));
+
+    const dialog = await screen.findByRole('dialog');
+    await user.type(within(dialog).getByLabelText(/full name/i), 'Dave Davis');
+    await user.type(within(dialog).getByLabelText(/^email$/i), 'dave@example.com');
+    await user.type(within(dialog).getByLabelText(/job title/i), 'Engineer');
+    await user.type(within(dialog).getByLabelText(/department/i), 'Engineering');
+    await user.type(within(dialog).getByLabelText(/country code/i), 'US');
+    await user.type(within(dialog).getByLabelText(/currency code/i), 'USD');
+    await user.type(within(dialog).getByLabelText(/salary/i), '5000000');
+    await user.type(within(dialog).getByLabelText(/hire date/i), '2024-01-01');
+    await user.click(within(dialog).getByRole('button', { name: /^create$/i }));
+
+    expect(await within(dialog).findByText(/could not save/i)).toBeInTheDocument();
+  });
+
   it('clicking edit opens a dialog pre-filled with the row data', async () => {
     const employee = buildEmployee({ id: 'e1', fullName: 'Alice Anderson' });
     server.use(
