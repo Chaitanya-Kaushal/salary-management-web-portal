@@ -39,10 +39,7 @@ describe('header', () => {
       http.get('http://localhost:4000/auth/me', () =>
         HttpResponse.json({ id: 'u1', email: 'hr@corp.example' }),
       ),
-      http.post(
-        'http://localhost:4000/auth/logout',
-        () => new HttpResponse(null, { status: 204 }),
-      ),
+      http.post('http://localhost:4000/auth/logout', () => new HttpResponse(null, { status: 204 })),
     );
 
     const user = userEvent.setup();
