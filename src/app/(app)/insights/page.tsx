@@ -55,7 +55,7 @@ export default function InsightsPage() {
       </Card>
 
       <Card>
-        <CardHeader className="flex flex-row items-start justify-between gap-3 space-y-0">
+        <CardHeader className="flex flex-col gap-3 space-y-0 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
           <div>
             <CardTitle>Salary distribution</CardTitle>
             <CardDescription>How salaries spread across pay bands.</CardDescription>
@@ -114,7 +114,7 @@ export default function InsightsPage() {
       </div>
 
       <Card>
-        <CardHeader className="flex flex-row items-start justify-between gap-3 space-y-0">
+        <CardHeader className="flex flex-col gap-3 space-y-0 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
           <div>
             <CardTitle>Average salary by role</CardTitle>
             <CardDescription>

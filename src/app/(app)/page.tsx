@@ -31,7 +31,7 @@ export default function HomePage() {
         <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-medium text-primary">
           <Sparkles className="h-3 w-3" /> HR dashboard
         </div>
-        <h1 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
+        <h1 className="mt-3 text-2xl font-bold tracking-tight wrap-break-word sm:text-3xl lg:text-4xl">
           Welcome back{user ? ',' : ''}{' '}
           {user ? <span className="text-primary">{user.name ?? user.email}</span> : null}
         </h1>

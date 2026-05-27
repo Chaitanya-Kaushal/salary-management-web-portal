@@ -11,7 +11,7 @@ export function Pagination({ page, pageSize, total, onPageChange }: Props) {
   const canNext = page < totalPages;
 
   return (
-    <div className="flex items-center justify-end gap-3 py-3 text-sm">
+    <div className="flex flex-wrap items-center justify-end gap-2 py-3 text-sm sm:gap-3">
       <button
         type="button"
         onClick={() => onPageChange(page - 1)}

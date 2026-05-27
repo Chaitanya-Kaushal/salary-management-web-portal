@@ -95,7 +95,7 @@ export default function EmployeesPage() {
               </Button>
             }
           />
-          <DialogContent className="sm:max-w-lg">
+          <DialogContent className="sm:max-w-2xl">
             <DialogHeader>
               <DialogTitle>Add employee</DialogTitle>
             </DialogHeader>
@@ -118,21 +118,21 @@ export default function EmployeesPage() {
       </header>
 
       <Card>
-        <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3 space-y-0">
+        <CardHeader className="flex flex-col gap-3 space-y-0 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
           <EmployeeFilters
             country={filters.country}
             department={filters.department}
             jobTitle={filters.jobTitle}
             onChange={(next) => setFilters({ ...next, page: 1 })}
           />
-          <div className="relative">
+          <div className="relative w-full sm:w-64">
             <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               type="search"
               placeholder="Search employees"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
-              className="w-64 pl-8"
+              className="w-full pl-8"
             />
           </div>
         </CardHeader>
