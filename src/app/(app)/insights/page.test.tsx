@@ -106,6 +106,24 @@ describe('insights page', () => {
     expect(await screen.findByText('> 200k')).toBeInTheDocument();
   });
 
+  it('renders headcount by department', async () => {
+    server.use(
+      summaryHandler(),
+      http.get('http://localhost:4000/insights/by-department', () =>
+        HttpResponse.json([
+          { department: 'Engineering', count: 25 },
+          { department: 'Sales', count: 12 },
+        ]),
+      ),
+    );
+
+    renderWithProviders(<InsightsPage />);
+
+    expect(await screen.findByText(/headcount by department/i)).toBeInTheDocument();
+    expect(await screen.findByText('Engineering')).toBeInTheDocument();
+    expect(await screen.findByText('Sales')).toBeInTheDocument();
+  });
+
   it('renders average salary by job title', async () => {
     server.use(
       summaryHandler(),
