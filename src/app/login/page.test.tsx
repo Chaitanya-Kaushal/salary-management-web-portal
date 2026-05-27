@@ -41,9 +41,14 @@ describe('login page', () => {
     expect(await screen.findByText(/invalid email/i)).toBeInTheDocument();
   });
 
-  it('posts to /auth/login and redirects to /employees on success', async () => {
+  it('posts to /auth/login, stores token, and redirects to /employees on success', async () => {
     server.use(
-      http.post('http://localhost:4000/auth/login', () => new HttpResponse(null, { status: 204 })),
+      http.post('http://localhost:4000/auth/login', () =>
+        HttpResponse.json({
+          token: 'test-token-abc',
+          user: { id: 'u1', email: 'hr@corp.example', name: 'HR Manager' },
+        }),
+      ),
     );
 
     const user = userEvent.setup();
@@ -56,5 +61,6 @@ describe('login page', () => {
     await waitFor(() => {
       expect(pushMock).toHaveBeenCalledWith('/employees');
     });
+    expect(window.localStorage.getItem('salary_auth_token')).toBe('test-token-abc');
   });
 });

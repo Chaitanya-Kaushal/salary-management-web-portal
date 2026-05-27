@@ -1,15 +1,28 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useMutation } from '@tanstack/react-query';
-import { apiClient } from '@/lib/api-client';
-import type { LoginInput } from '@/lib/api-contract';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiClient, setAuthToken } from '@/lib/api-client';
+import type { LoginInput, MeResponse } from '@/lib/api-contract';
+
+type LoginResponse = {
+  token: string;
+  user: MeResponse;
+};
 
 export function useLogin() {
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: LoginInput) => apiClient.post('/auth/login', data),
-    onSuccess: () => router.push('/employees'),
+    mutationFn: async (data: LoginInput): Promise<LoginResponse> => {
+      const res = await apiClient.post<LoginResponse>('/auth/login', data);
+      return res.data;
+    },
+    onSuccess: (data) => {
+      setAuthToken(data.token);
+      queryClient.setQueryData(['auth', 'me'], data.user);
+      router.push('/employees');
+    },
   });
 }
