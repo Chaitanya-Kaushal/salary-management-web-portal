@@ -104,9 +104,11 @@ export default function LoginPage() {
               <Button type="submit" disabled={loginMutation.isPending} className="w-full">
                 {loginMutation.isPending ? 'Signing in…' : 'Sign in'}
               </Button>
-              <p className="text-center text-xs text-muted-foreground">
-                Demo mode — any credentials work
-              </p>
+              {process.env.NEXT_PUBLIC_API_MOCKING === 'true' && (
+                <p className="text-center text-xs text-muted-foreground">
+                  Demo mode — any credentials work
+                </p>
+              )}
             </CardFooter>
           </form>
         </Card>
