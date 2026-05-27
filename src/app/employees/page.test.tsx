@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { http, HttpResponse } from 'msw';
@@ -88,6 +88,28 @@ describe('employees page', () => {
     renderWithProviders(<EmployeesPage />);
 
     expect(await screen.findByRole('status', { name: /loading employees/i })).toBeInTheDocument();
+  });
+
+  it('typing in search pushes search param to the URL', async () => {
+    const employees = [buildEmployee({ id: 'e1', fullName: 'Alice Anderson' })];
+    server.use(
+      http.get('http://localhost:4000/employees', () =>
+        HttpResponse.json({ data: employees, total: 1, page: 1, pageSize: 10 }),
+      ),
+    );
+
+    const user = userEvent.setup();
+    renderWithProviders(<EmployeesPage />);
+
+    await screen.findByText('Alice Anderson');
+    await user.type(screen.getByPlaceholderText(/search/i), 'bob');
+
+    await waitFor(
+      () => {
+        expect(pushMock).toHaveBeenCalledWith(expect.stringContaining('search=bob'));
+      },
+      { timeout: 1000 },
+    );
   });
 
   it('clicking next pushes page=2 to the URL', async () => {
