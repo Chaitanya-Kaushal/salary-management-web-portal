@@ -61,4 +61,19 @@ describe('employees page', () => {
       expect(await screen.findByText(emp.fullName)).toBeInTheDocument();
     }
   });
+
+  it('shows a loading indicator while fetching', async () => {
+    server.use(
+      http.get('http://localhost:4000/employees', async () => {
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        return HttpResponse.json({ data: [], total: 0, page: 1, pageSize: 10 });
+      }),
+    );
+
+    renderWithProviders(<EmployeesPage />);
+
+    expect(
+      await screen.findByRole('status', { name: /loading employees/i }),
+    ).toBeInTheDocument();
+  });
 });
