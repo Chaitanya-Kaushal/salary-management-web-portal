@@ -36,7 +36,7 @@ export function Navbar() {
           className="flex items-center gap-2 text-sm font-semibold tracking-tight"
           aria-label="Salary Management"
         >
-          <span className="grid h-7 w-7 place-items-center rounded-md bg-primary text-primary-foreground">
+          <span className="grid h-7 w-7 place-items-center rounded-md bg-primary text-primary-foreground shadow-sm">
             <Wallet2 className="h-4 w-4" />
           </span>
           <span className="hidden sm:inline">Salary Management</span>
@@ -52,7 +52,7 @@ export function Navbar() {
                 className={cn(
                   'rounded-md px-3 py-1.5 text-sm transition-colors',
                   active
-                    ? 'bg-muted text-foreground'
+                    ? 'bg-primary/10 text-primary'
                     : 'text-muted-foreground hover:bg-muted hover:text-foreground',
                 )}
               >
@@ -62,32 +62,45 @@ export function Navbar() {
           })}
         </nav>
 
-        <div className="ml-auto flex items-center gap-2">
+        <div className="ml-auto flex items-center gap-3">
           <ThemeToggle />
           {user && (
-            <DropdownMenu>
-              <DropdownMenuTrigger
-                render={
-                  <Button variant="ghost" size="sm" className="gap-2">
-                    <span className="hidden sm:inline text-sm">{user.email}</span>
-                    <span className="grid h-6 w-6 place-items-center rounded-full bg-muted text-xs font-semibold uppercase">
-                      {user.email[0]}
-                    </span>
-                  </Button>
-                }
-              />
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel className="text-xs text-muted-foreground">
-                  Signed in as
-                </DropdownMenuLabel>
-                <DropdownMenuLabel>{user.email}</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => logout.mutate()} disabled={logout.isPending}>
-                  <LogOut />
-                  Sign out
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <>
+              <span
+                aria-label="Signed in as"
+                className="hidden select-none text-sm text-muted-foreground sm:inline"
+              >
+                {user.email}
+              </span>
+              <DropdownMenu>
+                <DropdownMenuTrigger
+                  render={
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon-sm"
+                      aria-label="Open user menu"
+                      className="rounded-full"
+                    >
+                      <span className="grid h-7 w-7 place-items-center rounded-full bg-primary/15 text-xs font-semibold uppercase text-primary">
+                        {user.email[0]}
+                      </span>
+                    </Button>
+                  }
+                />
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel className="text-xs text-muted-foreground">
+                    Signed in as
+                  </DropdownMenuLabel>
+                  <DropdownMenuLabel>{user.email}</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => logout.mutate()} disabled={logout.isPending}>
+                    <LogOut />
+                    Sign out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
           )}
         </div>
       </div>
