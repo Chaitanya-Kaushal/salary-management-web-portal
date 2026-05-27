@@ -2,6 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
+import { EmployeeTable } from '@/components/employees/employee-table';
 import type { EmployeeListResponse } from '@/lib/api-contract';
 
 export default function EmployeesPage() {
@@ -23,7 +24,13 @@ export default function EmployeesPage() {
 
   return (
     <main className="p-8">
-      <p>{data.total} employees</p>
+      <header className="mb-4 flex items-end justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold">Employees</h1>
+          <p className="text-sm text-muted-foreground">{data.total} total</p>
+        </div>
+      </header>
+      <EmployeeTable employees={data.data} />
     </main>
   );
 }
