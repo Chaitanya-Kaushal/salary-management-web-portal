@@ -42,3 +42,36 @@ export const employeeListResponseSchema = z.object({
 });
 
 export type EmployeeListResponse = z.infer<typeof employeeListResponseSchema>;
+
+export const insightsSummarySchema = z.object({
+  totalEmployees: z.number(),
+  totalPayroll: z.number(),
+  topCountries: z.array(z.object({ country: z.string(), count: z.number() })),
+  topJobTitles: z.array(z.object({ jobTitle: z.string(), count: z.number() })),
+});
+
+export type InsightsSummary = z.infer<typeof insightsSummarySchema>;
+
+export const insightsByCountrySchema = z.array(
+  z.object({
+    country: z.string(),
+    count: z.number(),
+    min: z.number(),
+    max: z.number(),
+    avg: z.number(),
+    median: z.number(),
+    bands: z.array(z.object({ label: z.string(), count: z.number() })),
+  }),
+);
+
+export type InsightsByCountry = z.infer<typeof insightsByCountrySchema>;
+
+export const insightsByJobTitleSchema = z.array(
+  z.object({
+    jobTitle: z.string(),
+    count: z.number(),
+    avg: z.number(),
+  }),
+);
+
+export type InsightsByJobTitle = z.infer<typeof insightsByJobTitleSchema>;
