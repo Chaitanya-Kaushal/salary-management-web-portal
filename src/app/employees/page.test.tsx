@@ -45,6 +45,19 @@ describe('employees page', () => {
     searchParams = new URLSearchParams();
   });
 
+  it('shows an error state when the api returns 500', async () => {
+    server.use(
+      http.get(
+        'http://localhost:4000/employees',
+        () => new HttpResponse(null, { status: 500 }),
+      ),
+    );
+
+    renderWithProviders(<EmployeesPage />);
+
+    expect(await screen.findByText(/could not load employees/i)).toBeInTheDocument();
+  });
+
   it('shows empty state when there are no employees', async () => {
     server.use(
       http.get('http://localhost:4000/employees', () =>
