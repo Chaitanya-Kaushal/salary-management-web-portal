@@ -1,8 +1,11 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
+import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { apiClient } from '@/lib/api-client';
 
 const schema = z.object({
   email: z.string().email('Invalid email'),
@@ -12,6 +15,8 @@ const schema = z.object({
 type LoginInput = z.infer<typeof schema>;
 
 export default function LoginPage() {
+  const router = useRouter();
+
   const {
     register,
     handleSubmit,
@@ -20,7 +25,12 @@ export default function LoginPage() {
     resolver: zodResolver(schema),
   });
 
-  const onSubmit = (_data: LoginInput) => {};
+  const loginMutation = useMutation({
+    mutationFn: (data: LoginInput) => apiClient.post('/auth/login', data),
+    onSuccess: () => router.push('/employees'),
+  });
+
+  const onSubmit = (data: LoginInput) => loginMutation.mutate(data);
 
   return (
     <main className="flex min-h-screen items-center justify-center p-8">
@@ -61,8 +71,18 @@ export default function LoginPage() {
           )}
         </div>
 
-        <button type="submit" className="w-full rounded bg-foreground py-2 text-background">
-          Sign in
+        {loginMutation.isError && (
+          <p role="alert" className="text-sm text-destructive">
+            Sign in failed. Check your email and password.
+          </p>
+        )}
+
+        <button
+          type="submit"
+          disabled={loginMutation.isPending}
+          className="w-full rounded bg-foreground py-2 text-background disabled:opacity-60"
+        >
+          {loginMutation.isPending ? 'Signing in…' : 'Sign in'}
         </button>
       </form>
     </main>
