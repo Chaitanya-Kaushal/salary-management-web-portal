@@ -15,7 +15,6 @@ export function EmployeeFilters({ country, department, jobTitle, onChange }: Pro
       <label className="flex items-center gap-2 text-sm">
         <span className="sr-only">Country</span>
         <select
-          id="country"
           value={country ?? ''}
           onChange={(e) => onChange({ country: e.target.value || undefined })}
           className="rounded border px-2 py-2"
@@ -32,7 +31,6 @@ export function EmployeeFilters({ country, department, jobTitle, onChange }: Pro
       <label className="flex items-center gap-2 text-sm">
         <span className="sr-only">Department</span>
         <select
-          id="department"
           value={department ?? ''}
           onChange={(e) => onChange({ department: e.target.value || undefined })}
           className="rounded border px-2 py-2"
@@ -49,7 +47,6 @@ export function EmployeeFilters({ country, department, jobTitle, onChange }: Pro
       <label className="flex items-center gap-2 text-sm">
         <span className="sr-only">Job title</span>
         <select
-          id="jobTitle"
           value={jobTitle ?? ''}
           onChange={(e) => onChange({ jobTitle: e.target.value || undefined })}
           className="rounded border px-2 py-2"
