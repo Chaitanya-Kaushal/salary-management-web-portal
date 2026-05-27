@@ -21,7 +21,7 @@ export function HeadcountByDepartment({ data }: Props) {
   return (
     <div className="space-y-3">
       <div className="h-56 w-full">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
           <BarChart data={chartData} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
             <XAxis
               dataKey="name"

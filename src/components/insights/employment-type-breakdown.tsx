@@ -29,7 +29,7 @@ export function EmploymentTypeBreakdown({ data }: Props) {
   return (
     <div className="grid grid-cols-1 items-center gap-6 sm:grid-cols-[1fr_auto]">
       <div className="h-44 w-full">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
           <PieChart>
             <Pie
               data={chartData}

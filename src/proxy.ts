@@ -4,7 +4,7 @@ const PUBLIC_ROUTES = ['/login'];
 const AUTH_COOKIE = 'auth';
 const MOCKING_ENABLED = process.env.NEXT_PUBLIC_API_MOCKING === 'true';
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   if (MOCKING_ENABLED) {
     return NextResponse.next();
   }
