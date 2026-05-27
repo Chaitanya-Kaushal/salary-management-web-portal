@@ -1,8 +1,18 @@
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { http, HttpResponse } from 'msw';
 import { server } from '@/mocks/server';
 import EmployeesPage from './page';
+
+const pushMock = vi.fn();
+let searchParams = new URLSearchParams();
+
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: pushMock, replace: vi.fn() }),
+  useSearchParams: () => searchParams,
+  usePathname: () => '/employees',
+}));
 
 function renderWithProviders(ui: React.ReactNode) {
   const queryClient = new QueryClient({
@@ -30,6 +40,11 @@ function buildEmployee(overrides: Partial<{ id: string; fullName: string }> = {}
 }
 
 describe('employees page', () => {
+  beforeEach(() => {
+    pushMock.mockClear();
+    searchParams = new URLSearchParams();
+  });
+
   it('shows empty state when there are no employees', async () => {
     server.use(
       http.get('http://localhost:4000/employees', () =>
@@ -72,6 +87,28 @@ describe('employees page', () => {
 
     renderWithProviders(<EmployeesPage />);
 
-    expect(await screen.findByRole('status', { name: /loading employees/i })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('status', { name: /loading employees/i }),
+    ).toBeInTheDocument();
+  });
+
+  it('clicking next pushes page=2 to the URL', async () => {
+    const employees = Array.from({ length: 10 }, (_, i) =>
+      buildEmployee({ id: `e${i + 1}`, fullName: `Employee ${i + 1}` }),
+    );
+
+    server.use(
+      http.get('http://localhost:4000/employees', () =>
+        HttpResponse.json({ data: employees, total: 25, page: 1, pageSize: 10 }),
+      ),
+    );
+
+    const user = userEvent.setup();
+    renderWithProviders(<EmployeesPage />);
+
+    await screen.findByText('Employee 1');
+    await user.click(screen.getByRole('button', { name: /next/i }));
+
+    expect(pushMock).toHaveBeenCalledWith(expect.stringContaining('page=2'));
   });
 });
