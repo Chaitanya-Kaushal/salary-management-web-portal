@@ -112,6 +112,25 @@ describe('employees page', () => {
     );
   });
 
+  it('selecting a country filter pushes country param to the URL', async () => {
+    const employees = [buildEmployee({ id: 'e1', fullName: 'Alice Anderson' })];
+    server.use(
+      http.get('http://localhost:4000/employees', () =>
+        HttpResponse.json({ data: employees, total: 1, page: 1, pageSize: 10 }),
+      ),
+    );
+
+    const user = userEvent.setup();
+    renderWithProviders(<EmployeesPage />);
+
+    await screen.findByText('Alice Anderson');
+    await user.selectOptions(screen.getByLabelText(/country/i), 'US');
+
+    await waitFor(() => {
+      expect(pushMock).toHaveBeenCalledWith(expect.stringContaining('country=US'));
+    });
+  });
+
   it('clicking next pushes page=2 to the URL', async () => {
     const employees = Array.from({ length: 10 }, (_, i) =>
       buildEmployee({ id: `e${i + 1}`, fullName: `Employee ${i + 1}` }),
