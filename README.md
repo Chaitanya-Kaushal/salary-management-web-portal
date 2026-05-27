@@ -15,11 +15,13 @@ Frontend for a salary management tool aimed at an HR Manager of an org with 10,0
 
 ## What it does
 
-- Login (JWT cookie-based auth, redirect on success)
+- Login (JWT cookie-based auth, redirect on success) with polished card UI and dark-mode-aware backdrop
 - Auth-gated routes via Next.js middleware
+- Home dashboard with welcome, quick-stat cards, recent additions and shortcuts
 - Employees list with pagination, search, and country/department/job-title filters (all URL-driven)
-- Add, edit, and delete employees (delete is optimistic)
-- Insights dashboard: summary tiles, salaries by country (min/max/avg/median), average salary by role with country selector
+- Add, edit, and delete employees (delete is optimistic). **The Edit dialog is the employee detail view** — clicking Edit on a row shows every field; no separate `/employees/[id]` page by design.
+- Insights dashboard: summary tiles (total employees, countries, top country, top role), salaries by country (min/max/avg/median) **in each country's own currency**, salary distribution chart per country, headcount by department, employment-type breakdown, and average salary by role with country selector.
+- Persistent navbar (brand, nav links, user menu, **light/dark theme toggle**) and footer across authenticated pages.
 
 ## Run locally
 
