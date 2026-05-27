@@ -27,15 +27,20 @@ Frontend for a salary management tool aimed at an HR Manager of an org with 10,0
 
 ```bash
 npm install
-cp .env.example .env.local   # then edit NEXT_PUBLIC_API_URL to point at the backend
+cp .env.example .env   # edit values if needed (defaults work out of the box)
 npm run dev
 ```
 
-The app expects a backend at the URL set by `NEXT_PUBLIC_API_URL` (default `http://localhost:4000`). The backend repo is at `salary-management-api-server`.
+A single `.env` file holds config for both environments. `NODE_ENV` (set automatically by Next: `development` for `next dev`, `production` for `next build`) decides which URL is used:
+
+- `NEXT_PUBLIC_API_URL_DEV` — used in dev (default `http://localhost:4000`)
+- `NEXT_PUBLIC_API_URL_PROD` — used in production builds (Render URL)
+
+The backend repo is at `salary-management-api-server`.
 
 ### Run without a backend (dev mock mode)
 
-Add `NEXT_PUBLIC_API_MOCKING=true` to `.env.local` and restart `npm run dev`. The frontend will load an MSW service worker in the browser and intercept all API calls with realistic mock data (50 seeded employees across 5 countries). Login accepts any credentials. Auth middleware is bypassed while mocking is on. Useful for inspecting the UI before the real backend is up. **Production builds ignore this flag** — the worker is never started outside dev.
+`NEXT_PUBLIC_API_MOCKING=true` in `.env` makes the frontend load an MSW service worker in the browser and intercept all API calls with realistic mock data (50 seeded employees across 5 countries). Login accepts any credentials. Auth middleware is bypassed while mocking is on. Useful for inspecting the UI before the real backend is up. **Production builds ignore this flag** — the worker is never started outside dev.
 
 ## Tests
 
@@ -68,7 +73,7 @@ Run `git log --oneline` to see the cycle for each feature.
 
 1. Connect this repo to AWS Amplify Hosting and pick the branch to deploy (`main` for prod).
 2. Amplify picks up `amplify.yml` automatically — no further build config needed.
-3. Set the environment variable `NEXT_PUBLIC_API_URL` to the deployed backend's URL (e.g., `https://api.example.com`).
+3. Set `NEXT_PUBLIC_API_URL_PROD` in Amplify env vars to the deployed backend's URL (e.g., `https://api.example.com`) and `NEXT_PUBLIC_API_MOCKING=false`.
 4. Amplify auto-deploys on every push to the connected branch.
 
 ## Project layout
