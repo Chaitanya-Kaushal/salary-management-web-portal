@@ -131,6 +131,7 @@ export const devHandlers = [
       const salaries = list.map((e) => e.salary);
       return {
         country,
+        currency: list[0].currency,
         count: list.length,
         min: Math.min(...salaries),
         max: Math.max(...salaries),

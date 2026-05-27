@@ -55,6 +55,7 @@ export type InsightsSummary = z.infer<typeof insightsSummarySchema>;
 export const insightsByCountrySchema = z.array(
   z.object({
     country: z.string(),
+    currency: z.string(),
     count: z.number(),
     min: z.number(),
     max: z.number(),

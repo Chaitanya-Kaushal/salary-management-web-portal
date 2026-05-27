@@ -53,7 +53,10 @@ export default function InsightsPage() {
               </label>
             )}
           </header>
-          <ByJobTitleTable data={byJobTitle} />
+          <ByJobTitleTable
+            data={byJobTitle}
+            currency={byCountry?.find((c) => c.country === selectedCountry)?.currency}
+          />
         </section>
       )}
     </main>
