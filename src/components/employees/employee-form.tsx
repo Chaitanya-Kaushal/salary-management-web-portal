@@ -11,7 +11,7 @@ const schema = z.object({
   department: z.string().min(1, 'Department is required'),
   country: z.string().min(2, 'Country is required').max(2),
   currency: z.string().min(3, 'Currency is required').max(3),
-  salary: z.coerce.number().int().min(1, 'Salary is required'),
+  salary: z.number({ message: 'Salary is required' }).int().min(1, 'Salary is required'),
   employmentType: z.enum(['FULL_TIME', 'PART_TIME', 'CONTRACTOR']),
   hireDate: z.string().min(1, 'Hire date is required'),
 });
@@ -75,7 +75,12 @@ export function EmployeeForm({ defaultValues, submitLabel, onSubmit, isPending }
         </Field>
 
         <Field id="salary" label="Salary (in minor units)" error={errors.salary?.message}>
-          <input id="salary" type="number" {...register('salary')} className={inputCls} />
+          <input
+            id="salary"
+            type="number"
+            {...register('salary', { valueAsNumber: true })}
+            className={inputCls}
+          />
         </Field>
 
         <Field id="hireDate" label="Hire date" error={errors.hireDate?.message}>
