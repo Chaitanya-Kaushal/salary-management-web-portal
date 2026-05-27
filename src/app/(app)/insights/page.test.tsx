@@ -124,6 +124,26 @@ describe('insights page', () => {
     expect(await screen.findByText('Sales')).toBeInTheDocument();
   });
 
+  it('renders employment-type breakdown', async () => {
+    server.use(
+      summaryHandler(),
+      http.get('http://localhost:4000/insights/by-employment-type', () =>
+        HttpResponse.json([
+          { employmentType: 'FULL_TIME', count: 40 },
+          { employmentType: 'PART_TIME', count: 5 },
+          { employmentType: 'CONTRACTOR', count: 5 },
+        ]),
+      ),
+    );
+
+    renderWithProviders(<InsightsPage />);
+
+    expect(await screen.findByText(/employment type/i)).toBeInTheDocument();
+    expect(await screen.findByText(/full[- ]time/i)).toBeInTheDocument();
+    expect(await screen.findByText(/part[- ]time/i)).toBeInTheDocument();
+    expect(await screen.findByText(/contractor/i)).toBeInTheDocument();
+  });
+
   it('renders average salary by job title', async () => {
     server.use(
       summaryHandler(),
