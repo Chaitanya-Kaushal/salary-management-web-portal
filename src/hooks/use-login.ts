@@ -22,7 +22,7 @@ export function useLogin() {
     onSuccess: (data) => {
       setAuthToken(data.token);
       queryClient.setQueryData(['auth', 'me'], data.user);
-      router.push('/employees');
+      router.push('/');
     },
   });
 }
