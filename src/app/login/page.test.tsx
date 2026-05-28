@@ -41,7 +41,7 @@ describe('login page', () => {
     expect(await screen.findByText(/invalid email/i)).toBeInTheDocument();
   });
 
-  it('posts to /auth/login, stores token, and redirects to /employees on success', async () => {
+  it('posts to /auth/login, stores token, and redirects to home on success', async () => {
     server.use(
       http.post('http://localhost:4000/auth/login', () =>
         HttpResponse.json({
@@ -59,7 +59,7 @@ describe('login page', () => {
     await user.click(screen.getByRole('button', { name: /sign in/i }));
 
     await waitFor(() => {
-      expect(pushMock).toHaveBeenCalledWith('/employees');
+      expect(pushMock).toHaveBeenCalledWith('/');
     });
     expect(window.localStorage.getItem('salary_auth_token')).toBe('test-token-abc');
   });
