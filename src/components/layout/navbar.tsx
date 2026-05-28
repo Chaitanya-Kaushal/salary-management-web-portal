@@ -34,7 +34,7 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-30 w-full border-b border-primary/10 bg-primary/5 backdrop-blur-md">
-      <div className="mx-auto flex h-14 max-w-7xl items-center gap-3 px-3 sm:gap-6 sm:px-6 lg:px-8">
+      <div className="relative mx-auto flex h-14 max-w-7xl items-center gap-3 px-3 sm:gap-6 sm:px-6 lg:px-8">
         <Link
           href="/"
           className="flex items-center gap-2 text-sm font-semibold tracking-tight"
@@ -46,7 +46,7 @@ export function Navbar() {
           <span className="hidden sm:inline">Salary Management</span>
         </Link>
 
-        <nav className="hidden items-center gap-1 md:flex">
+        <nav className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-1 md:flex">
           {NAV_ITEMS.map((item) => (
             <Link
               key={item.href}
