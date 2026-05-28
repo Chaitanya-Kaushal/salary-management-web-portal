@@ -29,8 +29,7 @@ export function Navbar() {
   const displayName = user?.name ?? user?.email ?? '';
   const initial = displayName ? displayName[0] : '';
 
-  const isActive = (href: string) =>
-    href === '/' ? pathname === '/' : pathname.startsWith(href);
+  const isActive = (href: string) => (href === '/' ? pathname === '/' : pathname.startsWith(href));
 
   return (
     <header className="sticky top-0 z-30 w-full border-b border-primary/10 bg-primary/5 backdrop-blur-md">

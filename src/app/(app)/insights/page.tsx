@@ -117,9 +117,7 @@ export default function InsightsPage() {
         <CardHeader className="flex flex-col gap-3 space-y-0 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
           <div>
             <CardTitle>Average salary by role</CardTitle>
-            <CardDescription>
-              Compare pay across job titles, optionally by country.
-            </CardDescription>
+            <CardDescription>Compare pay across job titles, optionally by country.</CardDescription>
           </div>
           {byCountry && byCountry.length > 0 && (
             <CountrySelect
